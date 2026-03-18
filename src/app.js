@@ -6,16 +6,8 @@ const User = require("./model/user");
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const { firstName, lastName, age, gender, email, mobileNumber } = req.body;
   try {
-    const newUser = new User({
-      firstName,
-      lastName,
-      age,
-      gender,
-      email,
-      mobileNumber,
-    });
+    const newUser = new User(req.body);
 
     const savedUser = await newUser.save();
 
