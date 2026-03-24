@@ -4,7 +4,11 @@ const connectDB = require("./config/database");
 const User = require("./model/user");
 const { validateSignupData } = require("./utils/validate");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const { authMiddleware } = require("./middlewares/auth");
 
+app.use(cookieParser());
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
@@ -34,15 +38,47 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.passwordMatches(password);
     if (!isMatch) {
       return res.status(400).send({ error: "Invalid credentials" });
     }
+    const token = await user.getJwtToken();
+
+    res.cookie("token", token);
     res.status(200).send({ message: "Login successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const user = req.user;
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      res.status(404).send({ error: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/user", async (req, res) => {
+  try {
+    const users = await User.find();
+    if (users.length > 0) {
+      res.status(200).send(users);
+    } else {
+      res.status(404).send({ error: "User not found" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send({ error: error.message });
