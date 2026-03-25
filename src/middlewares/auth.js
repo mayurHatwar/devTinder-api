@@ -1,11 +1,11 @@
-const User = require("../model/user");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    const decoded = await jwt.verify(token, "Mayur@123");
-    const user = await User.findById(decoded.userId);
+    const decoded = await jwt.verify(token, "DEV@Tinder$790");
+    const user = await User.findById(decoded._id);
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
@@ -13,7 +13,7 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
-    res.status(500).send({ error: error.message });
+    res.status(401).send({ error: "Token is not valid" });
   }
 };
 module.exports = { authMiddleware };

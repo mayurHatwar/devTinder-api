@@ -1,13 +1,12 @@
 const express = require("express");
 const authRouter = express.Router();
-const User = require("../model/user");
+const User = require("../models/user");
 const { validateSignupData } = require("../utils/validate");
 const bcrypt = require("bcrypt");
 
 authRouter.post("/signup", async (req, res) => {
   try {
-    const { firstName, lastName, age, gender, email, mobileNumber, password } =
-      req.body;
+    const { firstName, lastName, age, gender, emailId, password } = req.body;
     validateSignupData(req.body);
     const encryptedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -15,8 +14,7 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       age,
       gender,
-      email,
-      mobileNumber,
+      emailId,
       password: encryptedPassword,
     });
     const savedUser = await newUser.save();
@@ -29,16 +27,16 @@ authRouter.post("/signup", async (req, res) => {
 
 authRouter.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId });
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
-    const isMatch = await user.passwordMatches(password);
+    const isMatch = await user.validatePassword(password);
     if (!isMatch) {
       return res.status(400).send({ error: "Invalid credentials" });
     }
-    const token = await user.getJwtToken();
+    const token = await user.getJWT();
     res.cookie("token", token);
     res.status(200).send({ message: "Login successful" });
   } catch (error) {
