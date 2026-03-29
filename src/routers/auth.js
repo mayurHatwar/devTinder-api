@@ -18,6 +18,8 @@ authRouter.post("/signup", async (req, res) => {
       password: encryptedPassword,
     });
     const savedUser = await newUser.save();
+    const token = await savedUser.getJWT();
+    res.cookie("token", token);
     res.status(201).json(savedUser);
   } catch (error) {
     console.error(error);

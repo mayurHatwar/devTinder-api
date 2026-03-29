@@ -60,7 +60,7 @@ userRouter.get("/user/connections", authMiddleware, async (req, res) => {
   }
 });
 
-userRouter.get("/user/feed", authMiddleware, async (req, res) => {
+userRouter.get("/feed", authMiddleware, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 10;
