@@ -12,7 +12,10 @@ userRouter.get("/user/requests/received", authMiddleware, async (req, res) => {
         toUserId: loggedInUserId,
         status: "interested",
       })
-      .populate("fromUserId", "firstName lastName gender profilePicture");
+      .populate(
+        "fromUserId",
+        "firstName lastName gender photoUrl about skills",
+      );
     res.json({
       message: "Connection requests received",
       data: connectionRequests,
@@ -35,11 +38,11 @@ userRouter.get("/user/connections", authMiddleware, async (req, res) => {
       })
       .populate(
         "fromUserId toUserId",
-        "firstName lastName gender profilePicture",
+        "firstName lastName gender photoUrl about skills",
       )
       .populate(
         "fromUserId toUserId",
-        "firstName lastName gender profilePicture",
+        "firstName lastName gender photoUrl about skills",
       );
     const data = connections.map((key) => {
       if (key.fromUserId._id.equals(loggedInUserId)) {
@@ -80,7 +83,7 @@ userRouter.get("/user/feed", authMiddleware, async (req, res) => {
         { _id: { $ne: loggedInUserId } },
       ],
     })
-      .select("firstName lastName gender profilePicture")
+      .select("firstName lastName gender photoUrl about skills")
       .skip((page - 1) * limit)
       .limit(limit);
     res.json({

@@ -30,24 +30,24 @@ authRouter.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
     const user = await User.findOne({ emailId });
     if (!user) {
-      return res.status(404).send({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
     const isMatch = await user.validatePassword(password);
     if (!isMatch) {
-      return res.status(400).send({ error: "Invalid credentials" });
+      return res.status(400).json({ error: "Invalid credentials" });
     }
     const token = await user.getJWT();
     res.cookie("token", token);
-    res.status(200).send({ message: "Login successful" });
+    res.status(200).json({ message: "Login successful", data: user });
   } catch (error) {
     console.error(error);
-    res.status(500).send({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
 authRouter.post("/logout", (req, res) => {
   res.clearCookie("token");
-  res.status(200).send({ message: "Logout successful" });
+  res.status(200).json({ message: "Logout successful" });
 });
 
 module.exports = authRouter;

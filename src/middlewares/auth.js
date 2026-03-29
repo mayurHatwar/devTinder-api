@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    const decoded = await jwt.verify(token, "DEV@Tinder$790");
+    const decoded = jwt.verify(token, "DEV@Tinder$790");
     const user = await User.findById(decoded._id);
     if (!user) {
       return res.status(404).send({ error: "User not found" });

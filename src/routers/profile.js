@@ -24,10 +24,12 @@ profileRouter.patch("/profile/edit", authMiddleware, async (req, res) => {
       "mobileNumber",
       "firstName",
       "lastName",
+      "photoUrl",
+      "about",
+      "skills",
     ];
 
     const user = req.user;
-
     const isAllowUpdate = Object.keys(req.body).every((key) =>
       allowUpdate.includes(key),
     );
@@ -44,8 +46,7 @@ profileRouter.patch("/profile/edit", authMiddleware, async (req, res) => {
 
     res.status(200).send(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: error.message });
+    res.status(400).send({ error: error.message });
   }
 });
 
