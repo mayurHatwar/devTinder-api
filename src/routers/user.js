@@ -26,6 +26,19 @@ userRouter.get("/user/requests/received", authMiddleware, async (req, res) => {
   }
 });
 
+userRouter.get("/users", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find({});
+    return res.status(200).json({
+      message: "All users",
+      data: users,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 userRouter.get("/user/connections", authMiddleware, async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
