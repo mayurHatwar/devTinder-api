@@ -4,6 +4,7 @@ const requestRouter = express.Router();
 const { authMiddleware } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
+const sendEmail = require("../utils/sendEmail");
 
 requestRouter.post(
   "/request/send/:status/:toUserId",
@@ -48,6 +49,12 @@ requestRouter.post(
           req.user.firstName + " is " + status + " in " + toUser.firstName,
         data,
       });
+
+      const emailRes = await sendEmail.run(
+        "A new friend request from " + req.user.firstName,
+        req.user.firstName + " is " + status + " in " + toUser.firstName,
+      );
+      console.log(emailRes);
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: error.message });
